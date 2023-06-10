@@ -40,7 +40,7 @@ public class PersonDAO {
     }
 
     public void save(Person person) {
-        jdbcTemplate.update("INSERT INTO Person VALUES(1, ?, ?, ?)", person.getName(),
+        jdbcTemplate.update("INSERT INTO Person(name, age, email) VALUES(?, ?, ?)", person.getName(),
                 person.getAge(), person.getEmail());
     }
 
@@ -79,13 +79,12 @@ public class PersonDAO {
         List<Person> people = create1000People();
         long before = System.currentTimeMillis();
 
-        jdbcTemplate.batchUpdate("INSERT INTO Person VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
+        jdbcTemplate.batchUpdate("INSERT INTO Person VALUES ( ?, ?, ?)", new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                preparedStatement.setInt(1, people.get(i).getId());
-                preparedStatement.setString(2, people.get(i).getName());
-                preparedStatement.setInt(3, people.get(i).getAge());
-                preparedStatement.setString(4, people.get(i).getEmail());
+                preparedStatement.setString(1, people.get(i).getName());
+                preparedStatement.setInt(2, people.get(i).getAge());
+                preparedStatement.setString(3, people.get(i).getEmail());
             }
 
             @Override
