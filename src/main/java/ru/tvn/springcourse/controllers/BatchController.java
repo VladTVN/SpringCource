@@ -19,17 +19,6 @@ public class BatchController {
         return "batch/index";
     }
 
-    @GetMapping("/without")
-    public String withoutBatch(){
-        personDAO.testMultipleUpdate();
-        return "redirect:/people";
-    }
-
-    @GetMapping("/with")
-    public String with(){
-        personDAO.testBatchUpdate();
-        return "redirect:/people";
-    }
 
 
 }
