@@ -7,10 +7,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -29,16 +33,24 @@ import java.util.Properties;
 @ComponentScan("ru.tvn.springcourse")
 @EnableWebMvc
 @EnableTransactionManagement
+@EnableJpaRepositories("ru.tvn.springcourse.repositories")
 @PropertySource("classpath:hibernate.properties")
 public class SpringConfig implements WebMvcConfigurer {
-
     private final ApplicationContext applicationContext;
+
     private final Environment environment;
 
     @Autowired
     public SpringConfig(ApplicationContext applicationContext, Environment environment) {
         this.applicationContext = applicationContext;
         this.environment = environment;
+    }
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
+        resolver.setTemplateEngine(templateEngine());
+        registry.viewResolver(resolver);
     }
 
     @Bean
@@ -76,27 +88,22 @@ public class SpringConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public LocalSessionFactoryBean sessionFactory(){
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan("ru.tvn.springcourse.models");
-        sessionFactory.setHibernateProperties(hibernateProperties());
-        return sessionFactory;
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(){
+        final LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactoryBean.setDataSource(dataSource());
+        entityManagerFactoryBean.setPackagesToScan("ru.tvn.springcourse.models");
+
+        final HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
+        entityManagerFactoryBean.setJpaVendorAdapter(hibernateJpaVendorAdapter);
+        entityManagerFactoryBean.setJpaProperties(hibernateProperties());
+        return entityManagerFactoryBean;
     }
 
     @Bean
-    public PlatformTransactionManager hibernatePlatformTransactionManager(){
-        HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager();
-        hibernateTransactionManager.setSessionFactory(sessionFactory().getObject());
-        return hibernateTransactionManager;
-    }
-
-
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-        resolver.setTemplateEngine(templateEngine());
-        registry.viewResolver(resolver);
+    public PlatformTransactionManager transactionManager(){
+        JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
+        jpaTransactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+        return jpaTransactionManager;
     }
 
 

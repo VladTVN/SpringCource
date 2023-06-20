@@ -7,22 +7,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ru.tvn.springcourse.dao.PersonDAO;
 import ru.tvn.springcourse.models.Person;
+import ru.tvn.springcourse.services.PeopleService;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-    private final PersonDAO personDAO;
+    private final PeopleService peopleService;
 
     @Autowired
-    public AdminController(PersonDAO personDAO) {
-        this.personDAO = personDAO;
+    public AdminController(PeopleService peopleService) {
+        this.peopleService = peopleService;
     }
 
     @GetMapping()
     public String adminPage(Model model, @ModelAttribute("person") Person person){
-        model.addAttribute("people",personDAO.index());
+        model.addAttribute("people",peopleService.findAll());
 
         return "/admin/adminPage";
     }
