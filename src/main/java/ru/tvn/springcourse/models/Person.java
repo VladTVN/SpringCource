@@ -3,7 +3,10 @@ package ru.tvn.springcourse.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import org.hibernate.annotations.CollectionId;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "Person")
@@ -28,16 +31,29 @@ public class Person {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "date_of_birth")
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date dateOfBirth;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST)
+    private List<Item> items;
+
     public Person() {
 
     }
 
-    public Person(int id, String name, int age, String email, String address) {
+    public Person(int id, String name, int age, String email, String address, List<Item> items) {
         this.id = id;
         this.name = name;
         this.age = age;
         this.email = email;
         this.address = address;
+        this.items = items;
     }
 
     public String getAddress() {
@@ -78,5 +94,29 @@ public class Person {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> item) {
+        this.items = item;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }
