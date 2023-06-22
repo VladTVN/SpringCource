@@ -26,6 +26,10 @@ public class Person {
     @Email(message = "Email should be valid")
     @Column(name = "email")
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    private Mood mood;
+
     @Pattern(regexp = "[A-Z]\\w+, [A-Z]\\w+, \\d{6}",
             message = "Your address should be in this format: Country, City, Postal Code (6 digits)")
     @Column(name = "address")
@@ -118,5 +122,13 @@ public class Person {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Mood getMood() {
+        return mood;
+    }
+
+    public void setMood(Mood mood) {
+        this.mood = mood;
     }
 }
